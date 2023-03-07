@@ -1,7 +1,6 @@
 Global / excludeLintKeys += ideBasePackages
 
 inThisBuild(Seq(
-  version := "0.1",
   organization := "com.github.ghik",
   homepage := Some(url("https://github.com/ghik/plainsbt")),
 
