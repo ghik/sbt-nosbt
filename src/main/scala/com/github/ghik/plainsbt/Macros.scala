@@ -6,9 +6,15 @@ class Macros(val c: blackbox.Context) {
 
   import c.universe.*
 
+  private def PlainsbtPkg = q"_root_.com.github.ghik.plainsbt"
+
   def discoverProjectsImpl: Tree = {
     val sbtProjectCls = c.mirror.staticClass("_root_.sbt.Project")
-    val rootProjectSym = c.mirror.staticClass("ProjectGroup").toType.member(TermName("root"))
+
+    val rootProjectSym =
+      c.mirror.staticClass("_root_.com.github.ghik.plainsbt.ProjectGroup")
+        .toType.member(TermName("root"))
+
     val ptpe = c.prefix.actualType
 
     val projectRefs =
@@ -25,5 +31,5 @@ class Macros(val c: blackbox.Context) {
   }
 
   def mkFreshProject: Tree =
-    q"FreshProject(_root_.sbt.project)"
+    q"$PlainsbtPkg.FreshProject(_root_.sbt.project)"
 }
