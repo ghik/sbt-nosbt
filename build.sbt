@@ -42,7 +42,7 @@ lazy val root = project.in(file("."))
       nameFormal = "PlainSBT",
       description = "SBT plugin for organizing your build into plain Scala files",
       homepage = Some(url("https://github.com/ghik/plainsbt")),
-      startYear = Some(2022),
+      startYear = Some(2023),
       licenses = Vector(
         "Apache License, Version 2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0")
       ),
