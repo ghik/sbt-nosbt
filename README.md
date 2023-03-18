@@ -90,7 +90,7 @@ Because `MyProj.scala` is a regular Scala file, its contents may be split and re
 
 We also need to tell `sbt` that `MyProj.scala` is the entry point of the entire build definition. In order to do that, we need to create a minimal, "bootstrapping" `build.sbt` file:
 
-```
+```scala
 lazy val root = MyProj.root
 ```
 
