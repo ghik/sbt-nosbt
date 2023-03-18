@@ -11,8 +11,8 @@ abstract class ProjectGroup(
 )(implicit
   discoveredProjects: DiscoveredProjects,
 ) extends AutoPlugin {
-  private def rootProjectId: String = parent.fold(groupName)(p => s"${p.rootProjectId}-$groupName")
-  private def subProjectId(name: String): String = s"$rootProjectId-$name"
+  protected def rootProjectId: String = parent.fold(groupName)(p => s"${p.rootProjectId}-$groupName")
+  protected def subProjectId(name: String): String = s"$rootProjectId-$name"
 
   final def baseDir: File = parent.fold(file("."))(p => p.baseDir / groupName)
 
