@@ -20,7 +20,7 @@ class Macros(val c: blackbox.Context) {
     val sbtProjectCls = c.mirror.staticClass("_root_.sbt.Project")
 
     val projectGroupTpe =
-      c.mirror.staticClass("_root_.com.github.ghik.sbt-nosbt.ProjectGroup").toType
+      c.mirror.staticClass("_root_.com.github.ghik.sbt.nosbt.ProjectGroup").toType
 
     val rootProjectSym =
       projectGroupTpe.member(TermName("root"))
