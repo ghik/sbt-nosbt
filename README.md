@@ -198,3 +198,5 @@ lazy val root = MyProj.root
   inThisBuild(MyProj.buildSettings)
   lazy val root = MyProj.root
   ```
+
+  In order to avoid these problems altogether, prefer overriding `ProjectGroup.commonSettings` rather than using `ThisBuild`.
