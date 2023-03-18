@@ -175,14 +175,14 @@ object FooService extends ProjectGroup("fooservice", MyProj) {
   lazy val root: Project = mkRootProject
   
   lazy val api: Project = mkSubProject.dependsOn(Commons.api)
-  lazy val impl: Project = mkSubProject.depensOn(api, Commons.db)
+  lazy val impl: Project = mkSubProject.dependsOn(api, Commons.db)
 }
 
 object BarService extends ProjectGroup("barservice", MyProj) {
   lazy val root: Project = mkRootProject
   
   lazy val api: Project = mkSubProject.dependsOn(Commons.api)
-  lazy val impl: Project = mkSubProject.depensOn(api, Commons.db, FooService.api)
+  lazy val impl: Project = mkSubProject.dependsOn(api, Commons.db, FooService.api)
 }
 ```
 
