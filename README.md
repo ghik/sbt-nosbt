@@ -39,7 +39,8 @@ import sbt.Keys._
 import sbt._
 
 object MyProj extends ProjectGroup("myproj") {
-  // the root project of your build; its ID is `myproj` and its base directory is the root directory of the build
+  // the root project of your build; its ID is `myproj` 
+  // and its base directory is the root directory of the build
   lazy val root: Project = mkRootProject
   
   /* Subprojects of your build */
