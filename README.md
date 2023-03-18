@@ -136,6 +136,7 @@ import sbt.Keys._
 import sbt._
 
 object MyProj extends ProjectGroup("myproj") {
+  // setting shared by all projects in this group and all its child groups
   override def commonSettings: Seq[Def.Setting[_]] = Seq(
     scalaVersion := "3.2.2",
   )
