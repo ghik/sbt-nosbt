@@ -1,4 +1,4 @@
-# `sbt-nosbt`
+# sbt-nosbt
 
 `sbt-nosbt` is an `sbt` plugin to make your complex, multi-module build definition more maintainable
 by moving build definition from `.sbt` files to plain Scala files and providing a nice convention for
