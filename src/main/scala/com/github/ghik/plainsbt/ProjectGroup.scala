@@ -32,6 +32,13 @@ abstract class ProjectGroup(
   def subprojectSettings: Seq[Def.Setting[_]] = Seq.empty
 
   /**
+   * Settings shared by all subprojects defined via [[mkSubProject]] in this [[ProjectGroup]] and all its
+   * child [[ProjectGroup]]s. This is like [[commonSettings]] but excludes all the intermediate aggregating projects,
+   * i.e. the root projects of each [[ProjectGroup]].
+   */
+  def leafSubprojectSettings: Seq[Def.Setting[_]] = Seq.empty
+
+  /**
    * Settings shared by all the projects defined in this [[ProjectGroup]], including its root project
    * (via [[mkRootProject]]) and directly defined subprojects (via [[mkSubProject]]).
    */
@@ -96,10 +103,12 @@ abstract class ProjectGroup(
       .withId(subProjectId(project.id))
       .settings(commonSettings)
       .settings(subprojectSettings)
+      .settings(leafSubprojectSettings)
       .settings(directCommonSettings)
       .settings(directSubprojectSettings)
       .settings(parent.mapOr(Nil, _.commonSettings))
       .settings(parent.mapOr(Nil, _.subprojectSettings))
+      .settings(parent.mapOr(Nil, _.leafSubprojectSettings))
   }
 
   /**
