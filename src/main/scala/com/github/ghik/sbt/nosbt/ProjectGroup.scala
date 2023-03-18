@@ -14,7 +14,9 @@ abstract class ProjectGroup(
   protected def rootProjectId: String = parent.fold(groupName)(p => s"${p.rootProjectId}-$groupName")
   protected def subProjectId(name: String): String = s"$rootProjectId-$name"
 
-  final def baseDir: File = parent.fold(file("."))(p => p.baseDir / groupName)
+  def parentGroup: Option[ProjectGroup] = parent.toOption
+
+  def baseDir: File = parent.fold(file("."))(p => p.baseDir / groupName)
 
   /**
    * Settings shared by all the projects defined in this [[ProjectGroup]] and its child [[ProjectGroup]]s
