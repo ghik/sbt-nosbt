@@ -20,6 +20,30 @@ abstract class ProjectGroup(
   final def baseDir: File = parent.fold(file("."))(p => p.baseDir / groupName)
 
   /**
+   * Settings shared by all the projects defined in this [[ProjectGroup]] and its child [[ProjectGroup]]s
+   * (i.e. those that declare this group as their [[parent]]).
+   */
+  def commonSettings: Seq[Def.Setting[_]] = Seq.empty
+
+  /**
+   * Settings shared by all the projects defined in this [[ProjectGroup]] and its child [[ProjectGroup]]s
+   * (i.e. those that declare this group as their [[parent]]), excluding the root project of this group.
+   */
+  def subprojectSettings: Seq[Def.Setting[_]] = Seq.empty
+
+  /**
+   * Settings shared by all the projects defined in this [[ProjectGroup]], including its root project
+   * (via [[mkRootProject]]) and directly defined subprojects (via [[mkSubProject]]).
+   */
+  def directCommonSettings: Seq[Def.Setting[_]] = Seq.empty
+
+  /**
+   * Settings shared by all the subprojects defined in this [[ProjectGroup]] via [[mkSubProject]].
+   * Like [[directCommonSettings]] but excludes the root project of this group.
+   */
+  def directSubprojectSettings: Seq[Def.Setting[_]] = Seq.empty
+
+  /**
    * A [[ProjectReference]] to the root project of this group. Use this if referring directly
    * to the root project would create a cycle during project resolution.
    */
@@ -52,6 +76,10 @@ abstract class ProjectGroup(
       .withId(rootProjectId)
       .enablePlugins(this)
       .aggregate(enumerateSubprojects.map(p => p: ProjectReference) *)
+      .settings(commonSettings)
+      .settings(directCommonSettings)
+      .settings(parent.mapOr(Nil, _.commonSettings))
+      .settings(parent.mapOr(Nil, _.subprojectSettings))
 
   /**
    * Creates a subproject in this project group. This method should be used in a similar way that regular
@@ -63,7 +91,15 @@ abstract class ProjectGroup(
    */
   protected def mkSubProject(implicit freshProject: FreshProject): Project = {
     val project = freshProject.project
-    project.in(baseDir / project.id).withId(subProjectId(project.id))
+    project
+      .in(baseDir / project.id)
+      .withId(subProjectId(project.id))
+      .settings(commonSettings)
+      .settings(subprojectSettings)
+      .settings(directCommonSettings)
+      .settings(directSubprojectSettings)
+      .settings(parent.mapOr(Nil, _.commonSettings))
+      .settings(parent.mapOr(Nil, _.subprojectSettings))
   }
 
   /**
