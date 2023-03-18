@@ -4,7 +4,7 @@
 
 ## Overview
 
-`sbt` can be intimidating. This is mostly due to various abstraction and "magic" layers. However, deep down, `sbt` build definition is ultimately just plain Scala code. This plugin aims to bring that plain Scala to the surface, removing at least some of the `sbt`'s magic.
+`sbt` can be intimidating. This is mostly due to various layers of abstraction and "magic" that it uses. However, deep down, `sbt` build definition is ultimately just plain Scala code. This plugin aims to bring that plain Scala to the surface, removing at least some of the `sbt`'s magic.
 
 ### `.sbt` files
 
