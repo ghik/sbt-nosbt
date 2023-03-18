@@ -1,4 +1,4 @@
-package com.github.ghik.plainsbt
+package com.github.ghik.sbt.nosbt
 
 import scala.reflect.macros.blackbox
 
@@ -6,7 +6,7 @@ class Macros(val c: blackbox.Context) {
 
   import c.universe.*
 
-  private def PlainsbtPkg = q"_root_.com.github.ghik.plainsbt"
+  private def NosbtPkg = q"_root_.com.github.ghik.sbt.nosbt"
 
   private def classBeingConstructed: ClassSymbol = {
     val ownerConstr = c.internal.enclosingOwner
@@ -20,7 +20,7 @@ class Macros(val c: blackbox.Context) {
     val sbtProjectCls = c.mirror.staticClass("_root_.sbt.Project")
 
     val projectGroupTpe =
-      c.mirror.staticClass("_root_.com.github.ghik.plainsbt.ProjectGroup").toType
+      c.mirror.staticClass("_root_.com.github.ghik.sbt-nosbt.ProjectGroup").toType
 
     val rootProjectSym =
       projectGroupTpe.member(TermName("root"))
@@ -42,5 +42,5 @@ class Macros(val c: blackbox.Context) {
   }
 
   def mkFreshProject: Tree =
-    q"$PlainsbtPkg.FreshProject(_root_.sbt.project)"
+    q"$NosbtPkg.FreshProject(_root_.sbt.project)"
 }

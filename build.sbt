@@ -2,7 +2,7 @@ Global / excludeLintKeys += ideBasePackages
 
 inThisBuild(Seq(
   organization := "com.github.ghik",
-  homepage := Some(url("https://github.com/ghik/plainsbt")),
+  homepage := Some(url("https://github.com/ghik/sbt-nosbt")),
 
   githubWorkflowTargetTags ++= Seq("v*"),
   githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17")),
@@ -22,7 +22,7 @@ inThisBuild(Seq(
 lazy val root = project.in(file("."))
   .enablePlugins(SbtPlugin)
   .settings(
-    name := "plainsbt",
+    name := "sbt-nosbt",
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
         case "2.12" => "1.8.0"
@@ -41,7 +41,7 @@ lazy val root = project.in(file("."))
     projectInfo := ModuleInfo(
       nameFormal = "PlainSBT",
       description = "SBT plugin for organizing your build into plain Scala files",
-      homepage = Some(url("https://github.com/ghik/plainsbt")),
+      homepage = Some(url("https://github.com/ghik/sbt-nosbt")),
       startYear = Some(2023),
       licenses = Vector(
         "Apache License, Version 2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0")
@@ -49,9 +49,9 @@ lazy val root = project.in(file("."))
       organizationName = "ghik",
       organizationHomepage = Some(url("https://github.com/ghik")),
       scmInfo = Some(ScmInfo(
-        browseUrl = url("https://github.com/ghik/plainsbt.git"),
-        connection = "scm:git:git@github.com:ghik/plainsbt.git",
-        devConnection = Some("scm:git:git@github.com:ghik/plainsbt.git")
+        browseUrl = url("https://github.com/ghik/sbt-nosbt.git"),
+        connection = "scm:git:git@github.com:ghik/sbt-nosbt.git",
+        devConnection = Some("scm:git:git@github.com:ghik/sbt-nosbt.git")
       )),
       developers = Vector(
         Developer("ghik", "Roman Janusz", "romeqjanoosh@gmail.com", url("https://github.com/ghik"))

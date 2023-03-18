@@ -1,7 +1,7 @@
-package com.github.ghik.plainsbt
+package com.github.ghik.sbt.nosbt
 
 import com.avsystem.commons.*
-import sbt.{Def, *}
+import sbt.*
 
 import scala.language.experimental.macros
 
