@@ -1,10 +1,10 @@
 # plainsbt
 
-`plainsbt` is a Scala plugin to make your complex, multi-module build definition maintainable like a regular Scala code.
+`plainsbt` is a Scala plugin to make your complex, multi-module build definition maintainable like regular Scala code.
 
 ## Overview
 
-`sbt` can be intimidating. This is mostly caused by various abstraction and "magic" layers that it employs. However, deep down, `sbt` build definition is ultimately just plain Scala code. This plugin aims to bring that plain Scala to the surface, removing at least some of the `sbt`'s magic around it.
+`sbt` can be intimidating. This is mostly due to various abstraction and "magic" layers. However, deep down, `sbt` build definition is ultimately just plain Scala code. This plugin aims to bring that plain Scala to the surface, removing at least some of the `sbt`'s magic.
 
 ### `.sbt` files
 
@@ -13,15 +13,15 @@
 * automatic import of keys and other definitions from `sbt` core and plugins
 * extracting all project definitions by looking for all `lazy val`s (and `val`s) typed as `Project`
 
-`.sbt` files may also refer to code in `project/*.scala` files, which are regular Scala files without any special treatment. While this allows you to move a lot of utility functions out of `.sbt` files, you are still forced to enumerate all your projects in `.sbt` files. Typically, this is a single `build.sbt` file.
+`.sbt` files may also refer to definitions in `project/*.scala` files, which are regular Scala files without any special treatment. While this allows you to move a lot of utility functions out of `.sbt` files, you are still forced to enumerate all your projects in `.sbt` files. Typically, this is a single `build.sbt` file.
 
 ### Moving to plain Scala
 
-`plainsbt` plugin allows you to move all your project definitions into plain Scala files inside `project` directory. This removes all the special `.sbt` preprocessing and allows you to organize your build definition like a regular Scala code by splitting it into multiple files that refer to each other explicitly. `plainsbt` also establishes a hierarchical convention that makes it easier to define complex, multi-project builds.
+`plainsbt` plugin allows you to move all your project definitions into plain Scala files. This removes all the special `.sbt` preprocessing and allows you to organize your build definition like regular Scala code by splitting it into multiple files that explicitly refer to each other. `plainsbt` also establishes a convention for project (and directory) hierarchy that makes it easier to define complex, multi-project builds.
 
 ## Usage example
 
-The full example is available as an [example project](https://github.com/ghik/plainsbt-example)
+The full example is available in an [example project repository](https://github.com/ghik/plainsbt-example)
 
 ### Simple multi-project build
 
