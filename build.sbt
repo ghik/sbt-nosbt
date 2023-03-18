@@ -39,7 +39,7 @@ lazy val root = project.in(file("."))
     publishTo := sonatypePublishToBundle.value,
 
     projectInfo := ModuleInfo(
-      nameFormal = "PlainSBT",
+      nameFormal = "sbt-nosbt",
       description = "SBT plugin for organizing your build into plain Scala files",
       homepage = Some(url("https://github.com/ghik/sbt-nosbt")),
       startYear = Some(2023),
