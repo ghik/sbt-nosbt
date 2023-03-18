@@ -105,6 +105,8 @@ abstract class ProjectGroup(
 
   final def subprojects: Seq[Project] = discoveredProjects.get(this)
 
+  override final def extraProjects: Seq[Project] = subprojects
+
   // make sure the user doesn't mistakenly override these
   override final def trigger: PluginTrigger = noTrigger
   override final def requires: Plugins = Plugins.empty
