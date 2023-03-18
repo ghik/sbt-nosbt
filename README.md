@@ -66,9 +66,6 @@ object MyProj extends ProjectGroup("myproj") {
   // settings in Global scope (optional)
   override def globalSettings: Seq[Def.Setting[_]] = 
     Seq(/* settings that you wish to be Global scope */)
-    
-  // mandatory boilerplate that collects the subprojects
-  protected def enumerateSubprojects: Seq[Project] = discoverProjects
 }
 ```
 
@@ -146,9 +143,6 @@ object MyProj extends ProjectGroup("myproj") {
   lazy val commons: Project = Commons.root
   lazy val fooservice: Project = FooService.root
   lazy val barservice: Project = BarService.root
-    
-  // mandatory boilerplate that collects the subprojects
-  protected def enumerateSubprojects: Seq[Project] = discoverProjects
 }
 
 object Commons extends ProjectGroup("commons", MyProj) {
@@ -156,9 +150,6 @@ object Commons extends ProjectGroup("commons", MyProj) {
   
   lazy val db: Project = mkSubProject
   lazy val api: Project = mkSubProject
-  
-  // mandatory boilerplate that collects the subprojects
-  protected def enumerateSubprojects: Seq[Project] = discoverProjects
 }
 
 object FooService extends ProjectGroup("fooservice", MyProj) {
@@ -166,9 +157,6 @@ object FooService extends ProjectGroup("fooservice", MyProj) {
   
   lazy val api: Project = mkSubProject.dependsOn(Commons.api)
   lazy val impl: Project = mkSubProject.depensOn(api, Commons.db)
-  
-  // mandatory boilerplate that collects the subprojects
-  protected def enumerateSubprojects: Seq[Project] = discoverProjects
 }
 
 object BarService extends ProjectGroup("barservice", MyProj) {
@@ -176,9 +164,6 @@ object BarService extends ProjectGroup("barservice", MyProj) {
   
   lazy val api: Project = mkSubProject.dependsOn(Commons.api)
   lazy val impl: Project = mkSubProject.depensOn(api, Commons.db, FooService.api)
-  
-  // mandatory boilerplate that collects the subprojects
-  protected def enumerateSubprojects: Seq[Project] = discoverProjects
 }
 ```
 

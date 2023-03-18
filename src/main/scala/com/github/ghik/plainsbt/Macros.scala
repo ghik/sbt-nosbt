@@ -8,14 +8,25 @@ class Macros(val c: blackbox.Context) {
 
   private def PlainsbtPkg = q"_root_.com.github.ghik.plainsbt"
 
+  private def classBeingConstructed: ClassSymbol = {
+    val ownerConstr = c.internal.enclosingOwner
+    if (!ownerConstr.isConstructor) {
+      c.abort(c.enclosingPosition, s"${c.macroApplication.symbol} can only be used as super constructor argument")
+    }
+    ownerConstr.owner.asClass
+  }
+
   def discoverProjectsImpl: Tree = {
     val sbtProjectCls = c.mirror.staticClass("_root_.sbt.Project")
 
-    val rootProjectSym =
-      c.mirror.staticClass("_root_.com.github.ghik.plainsbt.ProjectGroup")
-        .toType.member(TermName("root"))
+    val projectGroupTpe =
+      c.mirror.staticClass("_root_.com.github.ghik.plainsbt.ProjectGroup").toType
 
-    val ptpe = c.prefix.actualType
+    val rootProjectSym =
+      projectGroupTpe.member(TermName("root"))
+
+    val ptpe = classBeingConstructed.toType
+    val arg = c.freshName(TermName("pg"))
 
     val projectRefs =
       ptpe.members.iterator
@@ -24,10 +35,10 @@ class Macros(val c: blackbox.Context) {
             m.typeSignature.finalResultType.typeSymbol == sbtProjectCls &&
             !(m :: m.overrides).contains(rootProjectSym)
         }
-        .map(m => q"${c.prefix}.$m")
+        .map(m => q"$arg.asInstanceOf[$ptpe].$m")
         .toList
 
-    q"_root_.scala.Seq(..$projectRefs)"
+    q"($arg: $projectGroupTpe) => _root_.scala.Seq(..$projectRefs)"
   }
 
   def mkFreshProject: Tree =

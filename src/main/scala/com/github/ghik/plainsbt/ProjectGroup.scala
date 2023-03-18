@@ -5,14 +5,11 @@ import sbt.*
 
 import scala.language.experimental.macros
 
-case class FreshProject(project: Project) extends AnyVal
-object FreshProject {
-  implicit def materialize: FreshProject = macro Macros.mkFreshProject
-}
-
 abstract class ProjectGroup(
   val groupName: String,
   parent: OptArg[ProjectGroup] = OptArg.Empty
+)(implicit
+  discoveredProjects: DiscoveredProjects,
 ) extends AutoPlugin {
   private def rootProjectId: String = parent.fold(groupName)(p => s"${p.rootProjectId}-$groupName")
   private def subProjectId(name: String): String = s"$rootProjectId-$name"
@@ -23,32 +20,32 @@ abstract class ProjectGroup(
    * Settings shared by all the projects defined in this [[ProjectGroup]] and its child [[ProjectGroup]]s
    * (i.e. those that declare this group as their [[parent]]).
    */
-  def commonSettings: Seq[Def.Setting[_]] = Seq.empty
+  def commonSettings: Seq[Def.Setting[?]] = Seq.empty
 
   /**
    * Settings shared by all the projects defined in this [[ProjectGroup]] and its child [[ProjectGroup]]s
    * (i.e. those that declare this group as their [[parent]]), excluding the root project of this group.
    */
-  def subprojectSettings: Seq[Def.Setting[_]] = Seq.empty
+  def subprojectSettings: Seq[Def.Setting[?]] = Seq.empty
 
   /**
    * Settings shared by all subprojects defined via [[mkSubProject]] in this [[ProjectGroup]] and all its
    * child [[ProjectGroup]]s. This is like [[commonSettings]] but excludes all the intermediate aggregating projects,
    * i.e. the root projects of each [[ProjectGroup]].
    */
-  def leafSubprojectSettings: Seq[Def.Setting[_]] = Seq.empty
+  def leafSubprojectSettings: Seq[Def.Setting[?]] = Seq.empty
 
   /**
    * Settings shared by all the projects defined in this [[ProjectGroup]], including its root project
    * (via [[mkRootProject]]) and directly defined subprojects (via [[mkSubProject]]).
    */
-  def directCommonSettings: Seq[Def.Setting[_]] = Seq.empty
+  def directCommonSettings: Seq[Def.Setting[?]] = Seq.empty
 
   /**
    * Settings shared by all the subprojects defined in this [[ProjectGroup]] via [[mkSubProject]].
    * Like [[directCommonSettings]] but excludes the root project of this group.
    */
-  def directSubprojectSettings: Seq[Def.Setting[_]] = Seq.empty
+  def directSubprojectSettings: Seq[Def.Setting[?]] = Seq.empty
 
   /**
    * A [[ProjectReference]] to the root project of this group. Use this if referring directly
@@ -72,17 +69,12 @@ abstract class ProjectGroup(
    *
    * The root project will automatically aggregate all subprojects in the group
    * (i.e. tasks invoked on the root project will also be invoked on aggregated subprojects).
-   *
-   * Note how `this` is being added as an sbt plugin of this root project. The purpose of this is to make
-   * sbt see all the subprojects in this project group via [[extraProjects]]. Subprojects themselves
-   * are listed by the [[enumerateSubprojects]] method (which must always be implemented with [[discoverProjects]]
-   * macro).
    */
   protected def mkRootProject(implicit freshProject: FreshProject): Project =
     freshProject.project.in(baseDir)
       .withId(rootProjectId)
       .enablePlugins(this)
-      .aggregate(enumerateSubprojects.map(p => p: ProjectReference) *)
+      .aggregate(subprojects.map(p => p: ProjectReference) *)
       .settings(commonSettings)
       .settings(directCommonSettings)
       .settings(parent.mapOr(Nil, _.commonSettings))
@@ -111,18 +103,19 @@ abstract class ProjectGroup(
       .settings(parent.mapOr(Nil, _.leafSubprojectSettings))
   }
 
-  /**
-   * A macro that lists all the subprojects in this group. Subprojects must be assigned to public `lazy val`s.
-   * This macro must be used to implement [[enumerateSubprojects]] in every implementation of this class.
-   * The subprojects are then made visible to sbt via [[extraProjects]].
-   */
-  protected final def discoverProjects: Seq[Project] = macro Macros.discoverProjectsImpl
+  final def subprojects: Seq[Project] = discoveredProjects.get(this)
 
-  /**
-   * Implement this method in subclasses using [[discoverProjects]] macro.
-   * This is a boilerplate that must be repeated in every implementation.
-   */
-  protected def enumerateSubprojects: Seq[Project]
+  override final def extraProjects: Seq[Project] = subprojects
+}
 
-  override final def extraProjects: Seq[Project] = enumerateSubprojects
+case class FreshProject(project: Project) extends AnyVal
+object FreshProject {
+  implicit def materialize: FreshProject = macro Macros.mkFreshProject
+}
+
+trait DiscoveredProjects {
+  def get(group: ProjectGroup): Seq[Project]
+}
+object DiscoveredProjects {
+  implicit def materialize: DiscoveredProjects = macro Macros.discoverProjectsImpl
 }
