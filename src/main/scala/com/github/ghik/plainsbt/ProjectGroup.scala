@@ -66,15 +66,11 @@ abstract class ProjectGroup(
    * The base directory for this project will be set to:
    * - current directory if this project group is the toplevel group
    * - `<parentGroupDirectory>/<groupName>` otherwise
-   *
-   * The root project will automatically aggregate all subprojects in the group
-   * (i.e. tasks invoked on the root project will also be invoked on aggregated subprojects).
    */
   protected def mkRootProject(implicit freshProject: FreshProject): Project =
     freshProject.project.in(baseDir)
       .withId(rootProjectId)
       .enablePlugins(this)
-      .aggregate(subprojects.map(p => p: ProjectReference) *)
       .settings(commonSettings)
       .settings(directCommonSettings)
       .settings(parent.mapOr(Nil, _.commonSettings))

@@ -74,7 +74,6 @@ The above file is a complete definition of an `sbt` multi-project build, in plai
 * The root project must be defined as `lazy val root` and implemented with `mkSubProject`. ID of this project will be the same as name of the `ProjectGroup`, i.e. `myproj`. Base directory of this project is the build root directory.
 * All subprojects in the project group must be defined as `lazy val`s, just like you would do in an `.sbt` file. However, usage of `mkSubProject` makes sure that subprojects follow hierarchical naming and directory convention.
   For example `lazy val api: Project = mkSubProject` will define a subproject with ID `myproj-api` and base directory `api/`. Note how this is different from the default `sbt` behaviour which would place the project in a directory corresponding directly to its ID (i.e. `myproj-api/`).
-* The `root` project automatically [aggregates](https://www.scala-sbt.org/1.x/docs/Multi-Project.html#Aggregation) all subprojects.
 * Settings shared by all the projects in your build can be defined by overriding `commonSettings`. 
   Note how this is **not** the same as defining settings in `Global` or `ThisBuild` scopes - `commonSettings` are applied **directly** on each and every project which is more reliable than `Global`/`ThisBuild` and generally more recommended.
   There are also variations of `commonSettings`, e.g. `subprojectSettings`, `leafSubprojectSettings`, etc. which allow you to refine the exact set of projects that you want to apply settings on. Refer to `ProjectGroup`s API for details.
