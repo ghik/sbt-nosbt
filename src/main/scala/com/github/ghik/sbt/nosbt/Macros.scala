@@ -3,8 +3,9 @@ package com.github.ghik.sbt.nosbt
 import scala.reflect.macros.blackbox
 
 class Macros(val c: blackbox.Context) {
-
   import c.universe.*
+
+  private def ScalaPkg = q"_root_.scala"
 
   private def classBeingConstructed: ClassSymbol = {
     val ownerConstr = c.internal.enclosingOwner
@@ -17,6 +18,11 @@ class Macros(val c: blackbox.Context) {
   def discoverProjectsImpl: Tree = {
     val sbtProjectCls = c.mirror.staticClass("_root_.sbt.Project")
 
+    val crossProjectCls =
+      try c.mirror.staticClass("_root_.sbtcrossproject.CrossProject") catch {
+        case _: ScalaReflectionException => NoSymbol
+      }
+
     val projectGroupTpe =
       c.mirror.staticClass("_root_.com.github.ghik.sbt.nosbt.ProjectGroup").toType
 
@@ -28,15 +34,20 @@ class Macros(val c: blackbox.Context) {
 
     val projectRefs =
       ptpe.members.iterator
-        .filter { m =>
-          m.isTerm && m.asTerm.isGetter &&
+        .filter(m => m.isTerm && m.asTerm.isGetter)
+        .collect {
+          case m if
             m.typeSignature.finalResultType.typeSymbol == sbtProjectCls &&
-            !(m :: m.overrides).contains(rootProjectSym)
+              !(m :: m.overrides).contains(rootProjectSym) =>
+            q"$ScalaPkg.List($arg.asInstanceOf[$ptpe].$m)"
+          case m if
+            crossProjectCls != NoSymbol &&
+              m.typeSignature.finalResultType.typeSymbol == crossProjectCls =>
+            q"$arg.asInstanceOf[$ptpe].$m.projects.values.toList"
         }
-        .map(m => q"$arg.asInstanceOf[$ptpe].$m")
         .toList
 
-    q"($arg: $projectGroupTpe) => _root_.scala.Seq(..$projectRefs)"
+    q"($arg: $projectGroupTpe) => $ScalaPkg.List(..$projectRefs).flatten"
   }
 
   private def enclosingValName: String =
