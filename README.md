@@ -4,6 +4,23 @@
 by moving build definition from `.sbt` files to plain Scala files and providing a nice convention for
 hierarchical organization of subprojects.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Overview](#overview)
+  - [`.sbt` files](#sbt-files)
+  - [Moving to plain Scala](#moving-to-plain-scala)
+- [Usage example](#usage-example)
+  - [Setup](#setup)
+  - [Build definition](#build-definition)
+  - [Bootstrapping](#bootstrapping)
+- [Complex, multi-level hierarchies](#complex-multi-level-hierarchies)
+- [Cross project support (for Scala.js & Scala Native)](#cross-project-support-for-scalajs--scala-native)
+- [Caveats](#caveats)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Overview
 
 `sbt` can be intimidating. This is mostly due to various layers of abstraction and "magic" that it uses. However, deep
