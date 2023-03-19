@@ -112,7 +112,7 @@ lazy val root = MyProj.root
 
 _et voila!_
 
-### Complex, multi-level hierarchies
+## Complex, multi-level hierarchies
 
 Let's say your build is more complex. It is split into several "services", each one consisting of multiple subprojects.
 Let's say you want to achieve a project structure like this:
@@ -196,7 +196,7 @@ Finally, the boostrapping `build.sbt` file:
 lazy val root = MyProj.root
 ```
 
-### Cross project support (for Scala.js & Scala Native)
+## Cross project support (for Scala.js & Scala Native)
 
 If you want to use [`sbt-crossproject`](https://github.com/portable-scala/sbt-crossproject) for defining
 projects cross compiled to Scala.js and/or Scala Native, use `sbt-nosbt-crossproject`:
