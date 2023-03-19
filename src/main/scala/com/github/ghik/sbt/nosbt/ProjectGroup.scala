@@ -93,7 +93,7 @@ abstract class ProjectGroup(
   protected final def mkSubProject(implicit freshProject: FreshProject): Project =
     mkSubProject(freshProject.project)
 
-  protected def mkSubProject(freshProject: Project): Project = {
+  protected def mkSubProject(freshProject: Project): Project =
     freshProject
       .in(baseDir / freshProject.id)
       .withId(subProjectId(freshProject.id))
@@ -105,7 +105,6 @@ abstract class ProjectGroup(
       .settings(parent.mapOr(Nil, _.commonSettings))
       .settings(parent.mapOr(Nil, _.subprojectSettings))
       .settings(parent.mapOr(Nil, _.leafSubprojectSettings))
-  }
 
   final def subprojects: Seq[Project] = discoveredProjects.get(this)
 
