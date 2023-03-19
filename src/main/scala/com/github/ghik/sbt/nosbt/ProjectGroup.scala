@@ -69,9 +69,13 @@ abstract class ProjectGroup(
    * - current directory if this project group is the toplevel group
    * - `<parentGroupDirectory>/<groupName>` otherwise
    */
-  protected def mkRootProject(implicit freshProject: FreshProject): Project =
-    freshProject.project.in(baseDir)
+  protected final def mkRootProject(implicit freshProject: FreshProject): Project =
+    mkRootProject(freshProject.project)
+
+  protected def mkRootProject(freshProject: Project): Project =
+    freshProject
       .withId(rootProjectId)
+      .in(baseDir)
       .enablePlugins(this)
       .settings(commonSettings)
       .settings(directCommonSettings)
@@ -80,17 +84,19 @@ abstract class ProjectGroup(
 
   /**
    * Creates a subproject in this project group. This method should be used in a similar way that regular
-   * `sbt.project` method (macro) is used, i.e. it should be assigned to a `lazy val` public member in the
-   * class that extends [[ProjectGroup]].
+   * `sbt.project` method (macro) is used, i.e. it should be assigned to a `lazy val` public member in an
+   * object implementing [[ProjectGroup]].
    *
    * Name of this `lazy val` will be used as the subdirectory name for this project and as a suffix in the
    * ID of the project.
    */
-  protected def mkSubProject(implicit freshProject: FreshProject): Project = {
-    val project = freshProject.project
-    project
-      .in(baseDir / project.id)
-      .withId(subProjectId(project.id))
+  protected final def mkSubProject(implicit freshProject: FreshProject): Project =
+    mkSubProject(freshProject.project)
+
+  protected def mkSubProject(freshProject: Project): Project = {
+    freshProject
+      .in(baseDir / freshProject.id)
+      .withId(subProjectId(freshProject.id))
       .settings(commonSettings)
       .settings(subprojectSettings)
       .settings(leafSubprojectSettings)
@@ -112,7 +118,7 @@ abstract class ProjectGroup(
   override final def projectSettings: Seq[Def.Setting[?]] = Nil
 }
 
-case class FreshProject(project: Project) extends AnyVal
+case class FreshProject(project: Project)
 object FreshProject {
   implicit def materialize: FreshProject = macro Macros.mkFreshProject
 }
