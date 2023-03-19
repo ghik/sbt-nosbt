@@ -76,10 +76,10 @@ abstract class ProjectGroup(
       .settings(allRootProjectSettings)
 
   protected final def allRootProjectSettings: Seq[Def.Setting[?]] =
-    commonSettings ++
-      directCommonSettings ++
-      parent.mapOr(Nil, _.commonSettings) ++
-      parent.mapOr(Nil, _.subProjectSettings)
+    parent.mapOr(Nil, _.commonSettings) ++
+      parent.mapOr(Nil, _.subProjectSettings) ++
+      commonSettings ++
+      directCommonSettings
 
   /**
    * Creates a subproject in this project group. This method should be used in a similar way that regular
@@ -96,14 +96,14 @@ abstract class ProjectGroup(
       .settings(allSubProjectSettings)
 
   protected final def allSubProjectSettings: Seq[Def.Setting[?]] =
-    commonSettings ++
+    parent.mapOr(Nil, _.commonSettings) ++
+      parent.mapOr(Nil, _.subProjectSettings) ++
+      parent.mapOr(Nil, _.leafProjectSettings) ++
+      commonSettings ++
       subProjectSettings ++
       leafProjectSettings ++
       directCommonSettings ++
-      directSubProjectSettings ++
-      parent.mapOr(Nil, _.commonSettings) ++
-      parent.mapOr(Nil, _.subProjectSettings) ++
-      parent.mapOr(Nil, _.leafProjectSettings)
+      directSubProjectSettings
 
   final def subprojects: Seq[Project] = discoveredProjects.get(this)
 

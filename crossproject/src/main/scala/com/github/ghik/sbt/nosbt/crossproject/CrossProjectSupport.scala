@@ -1,7 +1,7 @@
 package com.github.ghik.sbt.nosbt
 package crossproject
 
-import com.avsystem.commons.misc.OptArg
+import com.avsystem.commons.*
 import sbtcrossproject.{CrossProject, CrossType, Platform}
 
 trait CrossProjectSupport { this: ProjectGroup =>
