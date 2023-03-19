@@ -6,6 +6,7 @@ class Macros(val c: blackbox.Context) {
   import c.universe.*
 
   private def ScalaPkg = q"_root_.scala"
+  private def NosbtPkg = q"_root_.com.github.ghik.sbt.nosbt"
 
   private def classBeingConstructed: ClassSymbol = {
     val ownerConstr = c.internal.enclosingOwner
@@ -58,4 +59,7 @@ class Macros(val c: blackbox.Context) {
 
   def mkCrossSubProjectImpl(platforms: c.Tree*): Tree =
     q"${c.prefix}.mkCrossSubProject($enclosingValName)(..$platforms)"
+
+  def enclosingValNameImpl: Tree =
+    q"$NosbtPkg.util.EnclosingValName($enclosingValName)"
 }
