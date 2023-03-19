@@ -34,13 +34,15 @@ it into multiple files that explicitly refer to each other. `sbt-nosbt` also est
 
 The full example is available in an [example project repository](https://github.com/ghik/sbt-nosbt-example)
 
-### Simple multi-project build
+### Setup
 
 Add the `nosbt` plugin to your `project/plugins.sbt`:
 
 ```scala
 addSbtPlugin("com.github.ghik" % "sbt-nosbt" % "<version>")
 ```
+
+### Build definition
 
 Now create a `project/MyProj.scala` file with definition of a `ProjectGroup`:
 
