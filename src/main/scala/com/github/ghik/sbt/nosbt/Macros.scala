@@ -6,8 +6,6 @@ class Macros(val c: blackbox.Context) {
 
   import c.universe.*
 
-  private def NosbtPkg = q"_root_.com.github.ghik.sbt.nosbt"
-
   private def classBeingConstructed: ClassSymbol = {
     val ownerConstr = c.internal.enclosingOwner
     if (!ownerConstr.isConstructor) {
@@ -41,6 +39,12 @@ class Macros(val c: blackbox.Context) {
     q"($arg: $projectGroupTpe) => _root_.scala.Seq(..$projectRefs)"
   }
 
-  def mkFreshProject: Tree =
-    q"$NosbtPkg.FreshProject(_root_.sbt.project)"
+  private def enclosingValName: String =
+    SbtMacroUtils.definingValName(c, methodName => s"$methodName must be assigned directly to a lazy val")
+
+  def mkSubProjectImpl: Tree =
+    q"${c.prefix}.mkSubProject($enclosingValName)"
+
+  def mkCrossSubProjectImpl(platforms: c.Tree*): Tree =
+    q"${c.prefix}.mkCrossSubProject($enclosingValName)(..$platforms)"
 }

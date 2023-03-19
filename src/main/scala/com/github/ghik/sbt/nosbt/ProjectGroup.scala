@@ -17,21 +17,22 @@ abstract class ProjectGroup(
   final def parentGroup: Option[ProjectGroup] = parent.toOption
 
   def baseDir: File = parent.fold(file("."))(p => p.baseDir / groupName)
+  protected def subProjectDir(name: String): File = baseDir / name
 
   /**
    * Settings shared by all the projects defined in this [[ProjectGroup]] and its child [[ProjectGroup]]s
-   * (i.e. those that declare this group as their [[parent]]).
+   * (i.e. those that declare this group as their [[parentGroup]]).
    */
   def commonSettings: Seq[Def.Setting[?]] = Seq.empty
 
   /**
    * Settings shared by all the projects defined in this [[ProjectGroup]] and its child [[ProjectGroup]]s
-   * (i.e. those that declare this group as their [[parent]]), excluding the root project of this group.
+   * (i.e. those that declare this group as their [[parentGroup]]), excluding the root project of this group.
    */
   def subProjectSettings: Seq[Def.Setting[?]] = Seq.empty
 
   /**
-   * Settings shared by all subprojects defined via [[mkSubProject]] in this [[ProjectGroup]] and all its
+   * Settings shared by all subprojects defined via `mkSubProject` in this [[ProjectGroup]] and all its
    * child [[ProjectGroup]]s. This is like [[commonSettings]] but excludes all the intermediate aggregating projects,
    * i.e. the root projects of each [[ProjectGroup]].
    */
@@ -39,18 +40,18 @@ abstract class ProjectGroup(
 
   /**
    * Settings shared by all the projects defined in this [[ProjectGroup]], including its root project
-   * (via [[mkRootProject]]) and directly defined subprojects (via [[mkSubProject]]).
+   * (via `mkRootProject` and directly defined subprojects (via `mkSubProject`).
    */
   def directCommonSettings: Seq[Def.Setting[?]] = Seq.empty
 
   /**
-   * Settings shared by all the subprojects defined in this [[ProjectGroup]] via [[mkSubProject]].
+   * Settings shared by all the subprojects defined in this [[ProjectGroup]] via `mkSubProject`.
    * Like [[directCommonSettings]] but excludes the root project of this group.
    */
   def directSubProjectSettings: Seq[Def.Setting[?]] = Seq.empty
 
   /**
-   * A [[ProjectReference]] to the root project of this group. Use this if referring directly
+   * A `ProjectReference` to the root project of this group. Use this if referring directly
    * to the root project would create a cycle during project resolution.
    */
   final def rootRef: ProjectReference = LocalProject(rootProjectId)
@@ -69,18 +70,16 @@ abstract class ProjectGroup(
    * - current directory if this project group is the toplevel group
    * - `<parentGroupDirectory>/<groupName>` otherwise
    */
-  protected final def mkRootProject(implicit freshProject: FreshProject): Project =
-    mkRootProject(freshProject.project)
-
-  protected def mkRootProject(freshProject: Project): Project =
-    freshProject
-      .withId(rootProjectId)
-      .in(baseDir)
+  protected def mkRootProject: Project =
+    Project(rootProjectId, baseDir)
       .enablePlugins(this)
-      .settings(commonSettings)
-      .settings(directCommonSettings)
-      .settings(parent.mapOr(Nil, _.commonSettings))
-      .settings(parent.mapOr(Nil, _.subProjectSettings))
+      .settings(allRootProjectSettings)
+
+  protected final def allRootProjectSettings: Seq[Def.Setting[?]] =
+    commonSettings ++
+      directCommonSettings ++
+      parent.mapOr(Nil, _.commonSettings) ++
+      parent.mapOr(Nil, _.subProjectSettings)
 
   /**
    * Creates a subproject in this project group. This method should be used in a similar way that regular
@@ -90,21 +89,21 @@ abstract class ProjectGroup(
    * Name of this `lazy val` will be used as the subdirectory name for this project and as a suffix in the
    * ID of the project.
    */
-  protected final def mkSubProject(implicit freshProject: FreshProject): Project =
-    mkSubProject(freshProject.project)
+  protected final def mkSubProject: Project = macro Macros.mkSubProjectImpl
 
-  protected def mkSubProject(freshProject: Project): Project =
-    freshProject
-      .in(baseDir / freshProject.id)
-      .withId(subProjectId(freshProject.id))
-      .settings(commonSettings)
-      .settings(subProjectSettings)
-      .settings(leafProjectSettings)
-      .settings(directCommonSettings)
-      .settings(directSubProjectSettings)
-      .settings(parent.mapOr(Nil, _.commonSettings))
-      .settings(parent.mapOr(Nil, _.subProjectSettings))
-      .settings(parent.mapOr(Nil, _.leafProjectSettings))
+  protected def mkSubProject(name: String): Project =
+    Project(subProjectId(name), subProjectDir(name))
+      .settings(allSubProjectSettings)
+
+  protected final def allSubProjectSettings: Seq[Def.Setting[?]] =
+    commonSettings ++
+      subProjectSettings ++
+      leafProjectSettings ++
+      directCommonSettings ++
+      directSubProjectSettings ++
+      parent.mapOr(Nil, _.commonSettings) ++
+      parent.mapOr(Nil, _.subProjectSettings) ++
+      parent.mapOr(Nil, _.leafProjectSettings)
 
   final def subprojects: Seq[Project] = discoveredProjects.get(this)
 
@@ -115,11 +114,6 @@ abstract class ProjectGroup(
   override final def requires: Plugins = Plugins.empty
   override final def projectConfigurations: Seq[Configuration] = Nil
   override final def projectSettings: Seq[Def.Setting[?]] = Nil
-}
-
-final case class FreshProject(project: Project)
-object FreshProject {
-  implicit def materialize: FreshProject = macro Macros.mkFreshProject
 }
 
 trait DiscoveredProjects {
