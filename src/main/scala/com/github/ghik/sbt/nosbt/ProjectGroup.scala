@@ -28,14 +28,14 @@ abstract class ProjectGroup(
    * Settings shared by all the projects defined in this [[ProjectGroup]] and its child [[ProjectGroup]]s
    * (i.e. those that declare this group as their [[parent]]), excluding the root project of this group.
    */
-  def subprojectSettings: Seq[Def.Setting[?]] = Seq.empty
+  def subProjectSettings: Seq[Def.Setting[?]] = Seq.empty
 
   /**
    * Settings shared by all subprojects defined via [[mkSubProject]] in this [[ProjectGroup]] and all its
    * child [[ProjectGroup]]s. This is like [[commonSettings]] but excludes all the intermediate aggregating projects,
    * i.e. the root projects of each [[ProjectGroup]].
    */
-  def leafSubprojectSettings: Seq[Def.Setting[?]] = Seq.empty
+  def leafProjectSettings: Seq[Def.Setting[?]] = Seq.empty
 
   /**
    * Settings shared by all the projects defined in this [[ProjectGroup]], including its root project
@@ -47,7 +47,7 @@ abstract class ProjectGroup(
    * Settings shared by all the subprojects defined in this [[ProjectGroup]] via [[mkSubProject]].
    * Like [[directCommonSettings]] but excludes the root project of this group.
    */
-  def directSubprojectSettings: Seq[Def.Setting[?]] = Seq.empty
+  def directSubProjectSettings: Seq[Def.Setting[?]] = Seq.empty
 
   /**
    * A [[ProjectReference]] to the root project of this group. Use this if referring directly
@@ -80,7 +80,7 @@ abstract class ProjectGroup(
       .settings(commonSettings)
       .settings(directCommonSettings)
       .settings(parent.mapOr(Nil, _.commonSettings))
-      .settings(parent.mapOr(Nil, _.subprojectSettings))
+      .settings(parent.mapOr(Nil, _.subProjectSettings))
 
   /**
    * Creates a subproject in this project group. This method should be used in a similar way that regular
@@ -98,13 +98,13 @@ abstract class ProjectGroup(
       .in(baseDir / freshProject.id)
       .withId(subProjectId(freshProject.id))
       .settings(commonSettings)
-      .settings(subprojectSettings)
-      .settings(leafSubprojectSettings)
+      .settings(subProjectSettings)
+      .settings(leafProjectSettings)
       .settings(directCommonSettings)
-      .settings(directSubprojectSettings)
+      .settings(directSubProjectSettings)
       .settings(parent.mapOr(Nil, _.commonSettings))
-      .settings(parent.mapOr(Nil, _.subprojectSettings))
-      .settings(parent.mapOr(Nil, _.leafSubprojectSettings))
+      .settings(parent.mapOr(Nil, _.subProjectSettings))
+      .settings(parent.mapOr(Nil, _.leafProjectSettings))
 
   final def subprojects: Seq[Project] = discoveredProjects.get(this)
 
@@ -117,7 +117,7 @@ abstract class ProjectGroup(
   override final def projectSettings: Seq[Def.Setting[?]] = Nil
 }
 
-case class FreshProject(project: Project)
+final case class FreshProject(project: Project)
 object FreshProject {
   implicit def materialize: FreshProject = macro Macros.mkFreshProject
 }
